@@ -1,0 +1,7 @@
+Installing:Инсталлируем Play
+NewApplication:Создаем новое приложение
+PlayConsole:Используем Play консоль
+IDE:Настройка предпочитаемой вами IDE
+Anatomy:Анатомия приложения Play
+Tutorials:Руководства по Play
+Modules:Модули Play
