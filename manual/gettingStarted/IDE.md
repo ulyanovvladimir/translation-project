@@ -31,92 +31,92 @@ EclipseKeys.projectFlavor := EclipseProjectFlavor.Java           // Java проект.
 EclipseKeys.createSrc := EclipseCreateSrc.ValueSet(EclipseCreateSrc.ManagedClasses, EclipseCreateSrc.ManagedResources)  // Использовать .class файлы вместо сгенерированных .scala файлов для видов и маршрутов 
 ```
 
-### Generate configuration
+### Генерация конфигурации
 
-Play provides a command to simplify [Eclipse](https://eclipse.org/) configuration. To transform a Play application into a working Eclipse project, use the `eclipse` command:
+Play предоставляет команду для упрощения конфигурации [Eclipse](https://eclipse.org/). Чтобы трансформировать To transform a Play application into a working Eclipse project, use the `eclipse` command:
 
 ```bash
 [my-first-app] $ eclipse
 ```
 
-If you want to grab the available source jars (this will take longer and it's possible a few sources might be missing):
+Если вы хотите скачать доступные исходные jar-ки (это будет дольше и возможно, что некоторые исходники будут отсутствовать):
 
 ```bash
 [my-first-app] $ eclipse with-source=true
 ```
 
-> Note if you are using sub-projects with aggregate, you would need to set `skipParents` appropriately in `build.sbt`:
+> Обратите внимание, если ы используете подпроекты с агрегированием вам потребуется установить `skipParents` подходящим образом в `build.sbt`:
 
 ```scala
 EclipseKeys.skipParents in ThisBuild := false
 ```
 
-or from the play console, type:
+или через консоль, наберите:
 
 ```bash
 [my-first-app] $ eclipse skip-parents=false
 ```
 
-You then need to import the application into your Workspace with the **File/Import/General/Existing projectвЂ¦** menu (compile your project first).
+Затем вам нужно проимпортировать приложение в ваш Workspace с помощью меню **File/Import/General/Existing project¦**  (сперва скомпилируйте ваше приложение).
 
 [[images/eclipse.png]] 
 
-To debug, start your application with `activator -jvm-debug 9999 run` and in Eclipse right-click on the project and select **Debug As**, **Debug Configurations**. In the **Debug Configurations** dialog, right-click on **Remote Java Application** and select **New**. Change **Port** to 9999 and click **Apply**. From now on you can click on **Debug** to connect to the running application. Stopping the debugging session will not stop the server.
+Для отладки стартуйте ваше приложение с помощью `activator -jvm-debug 9999 run` и в  Eclipse по правой кнопке мыши на проекте выберите **Debug As**, **Debug Configurations**. В диалоге **Debug Configurations**, по правой кнопке мыши на **Remote Java Application** выберите **New**. Измените **Port** на 9999 и нажмите **Apply**. С этого момента вы можете нажать **Debug** для соединения с запущенным приложением. Остановка отладочной сессии не приведет к остановке сервера.
 
-> **Tip**: You can run your application using `~run` to enable direct compilation on file change. This way scala template files are auto discovered when you create a new template in `view` and auto compiled when the file changes. If you use normal `run` then you have to hit `Refresh` on your browser each time.
+> **Подсказка**: Вы можете запустить ваше приложение используя `~run` чтобы включить непосредственную компиляцию при изменении файловисходников. Таким способом файлы шаблонов scala автоматически обнаруживаются, когда вы создаете новый шаблон во `view` и автоматически компилируются, когда файлы изменяются.
 
-If you make any important changes to your application, such as changing the classpath, use `eclipse` again to regenerate the configuration files.
+Если вы делаете какие-то важные изменения вашего приложения, такие как изменения classpath, используйте команду `eclipse` еще раз чтобы перегенерировать конфигурационные файлы.
 
-> **Tip**: Do not commit Eclipse configuration files when you work in a team!
+> **Подсказка**: Не коммитьте конфигурацию Eclipse, когда вы раобтаете в команде!
 
-The generated configuration files contain absolute references to your framework installation. These are specific to your own installation. When you work in a team, each developer must keep his Eclipse configuration files private.
+Сгенерированные конфигурационные файлы, содержат ссылки на абсолютные пути до установленного фреймворка. Они специфичны для вашей устаовки. Когда работаете в команде, каждый рзработчик должен держать приватными файлы конфигурации Eclipse.
 
 ## IntelliJ
 
-[Intellij IDEA](https://www.jetbrains.com/idea/) lets you quickly create a Play application without using a command prompt. You don't need to configure anything outside of the IDE, the SBT build tool takes care of downloading appropriate libraries, resolving dependencies and building the project.
+[Intellij IDEA](https://www.jetbrains.com/idea/) позволяет вам быстро создавать Play приложения без использования командной строки. Вам не нужно конфигурировать ничего вне вашей IDE, SBT build tool позаботится о скачивании необходимых библиотек, разрешении зависимостей и сборке проекта.
 
-Before you start creating a Play application in IntelliJ IDEA, make sure that the latest [Scala Plugin](http://www.jetbrains.com/idea/features/scala.html) is installed and enabled in IntelliJ IDEA. Even if you don't develop in Scala, it will help with the template engine and also resolving dependencies.
+Перед тем как вы начнете создание проиложения Play в IntelliJ IDEA, убедитесь, что последний [Scala Плагин](http://www.jetbrains.com/idea/features/scala.html) установлен и включен в IntelliJ IDEA. Даже если вы не разработаываете на Scala, он поможет с движком шаблонов и еще с разрешением зависимостей.
 
-To create a Play application:
+Чтобы создать приложение Play:
 
-1. Open ***New Project*** wizard, select ***Play 2.x*** under ***Scala*** section and click ***Next***.
-2. Enter your project's information and click ***Finish***.
+1. Откройте мастер ***New Project***, выберите ***Play 2.x*** под секцией ***Scala*** и нажмите ***Next***.
+2. Введите информацию о вашем проекте и нажмите ***Finish***.
 
-IntelliJ IDEA creates an empty application using SBT.
+IntelliJ IDEA создаст пустое приложение, используя SBT.
 
-Currently, for Play 2.4.x, instead of using the IntelliJ wizard to create a new project, we suggest that you create it using Activator and then Import it to IntelliJ.
+В настоящий момент для Play 2.4.x вместо использования мастер создания нового проекта мы предлагаем создавать его с помощью Активатора и затем Импортировать его в IntelliJ.
 
-You can also import an existing Play project.
+Вы также можете импортировать существующий проект.
 
-To import a Play project:
+Чтобы проимпортировать проект Play:
 
-1. Open Project wizard, select ***Import Project***.
-2. In the window that opens, select a project you want to import and click ***OK***.
-3. On the next page of the wizard, select ***Import project from external model*** option, choose ***SBT project*** and click ***Next***. 
-4. On the next page of the wizard, select additional import options and click ***Finish***. 
+1. Откройте мастер Project, выберите ***Import Project***.
+2. В окне, которое откроется, выберите проект, который вы хотите проимпортировать и нажмите ***OK***.
+3. На следующей странице мастера выберите опцию ***Import project from external model*** , выберите ***SBT project*** и нажмите ***Next***. 
+4. На следующей странице мастера выберите дополнительные опции импорта и нажмите ***Finish***. 
 
-Check the project's structure, make sure all necessary dependencies are downloaded. You can use code assistance, navigation and on-the-fly code analysis features.
+Выберите структуру проекта, убедитесь, что скачаны все необходимые зависимости. Вы можете использовать помощь в кодировании, навигацию и возможности анализа кода на лету.
 
-You can run the created application and view the result in the default browser `http://localhost:9000`. To run a Play application:
+Вы можете запустить созданное приложение и посмотреть результат в браузере по адресу `http://localhost:9000`. Чтобы запустить приложение Play:
 
-1. Create a new Run Configuration -- From the main menu, select Run -> Edit Configurations
-2. Click on the + to add a new configuration
-3. From the list of configurations, choose "SBT Task"
-4. In the "tasks" input box, simply put "run"
-5. Apply changes and select OK.
-6. Now you can choose "Run" from the main Run menu and run your application
+1. Создайте новую конфигурацию Run  -- Из главного меню выберите Run -> Edit Configurations
+2. Нажмите на + чтобы добавить новую конфигурацию
+3. Из списка конфигураций выберите "SBT Task"
+4. В поле ввода "tasks", просто введите "run"
+5. Примените изменения и нажмите OK.
+6. Теперь вы можете использовать "Run" из главногоо меню Run и запустить ваше приложение
 
-You can easily start a debugger session for a Play application using default Run/Debug Configuration settings.
+ВЫ можете легко запустить отладочную сессию для приложения Play, используя дефолтные настройки Run/Debug .
 
-For more detailed information, see the Play Framework 2.x tutorial at the following URL:
+Для более детальной информации, см. Play Framework 2.x руководство по следующему URL:
 
 <https://confluence.jetbrains.com/display/IntelliJIDEA/Play+Framework+2.0> 
 
-### Navigate from an error page to the source code
+### Навигация от страницы с ошибкой до исходников 
 
-Using the `play.editor` configuration option, you can set up Play to add hyperlinks to an error page. Since then, you can easily navigate from error pages to IntelliJ, directly into the source code (you need to install the Remote Call <https://github.com/Zolotov/RemoteCall> IntelliJ plugin first).
+Используя конфигурационную опцию `play.editor`, вы можете установить Play чтобы добавить гиперссылки на страницу с ошибкой. С этого момента вы можете легко переходить от страниц с ошибкой к IntelliJ, прямо в ваши исходники (вам неоходимо сначала установить плагин RemoteCall <https://github.com/Zolotov/RemoteCall> для IntelliJ).
 
-Just install the Remote Call plugin and run your app with the following options:
+Просто установите плагин Remote Call и запустите ваше приложение со следующими опциями:
 `-Dplay.editor=http://localhost:8091/?message=%s:%s -Dapplication.mode=dev`
 
 
