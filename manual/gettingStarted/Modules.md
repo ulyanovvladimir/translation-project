@@ -1,18 +1,18 @@
 <!--- Copyright (C) 2009-2015 Typesafe Inc. <http://www.typesafe.com> -->
-# Play Modules
+# Модули Play
 
-At its core, Play is a very lightweight HTTP server, providing mechanisms for serving HTTP requests, but not much else. Additional functionality in Play is provided through the use of Play modules.
+В ядре Play  - очень легковесный HTTP сервер, предоставляющий механизм для обработки  HTTP запросов и ничего более. Дополнительная функциональность в Play предоставляется через использование модулей Play.
 
-## What is a module?
+## Что такое модуль Play?
 
-There is no strict definition in Play of what a module is or isn't - a module could be just a library that provides some helper methods to help you do something, or it could be a full framework providing complex functionality such as user management. Some modules are built in to Play, others are written and maintained by members of the Play community.
+Нет строгого определения в Play, что есть модуль, а что им не является - модуль может быть всего лишь библиотекой, которая предоставляет вспомогательные методы , для того чтобы помочь вам что-нибудь делать, или это может быть полноценный фреймворк, предоставляющий сложную функциональность, такую как управление пользователями. Некоторые модуль встроены в Play, другие написаны и поддерживаются членами сообщества.
 
-Some modules provide components - objects that represent resources, for example a database connection.  These objects may have a lifecycle and need to be started and stopped when the application starts and stops, and they may hold some state such as a cache. Play provides a variety of mechanisms for accessing and using these components. Components are not only provided by modules, they may be provided by the application themselves.
+Некоторые модули предоставляют компоненты - объекты, которые представляют ресурсы, например, соединение с базой данных. Эти объекты могут иметь жизненный цикл и  нуждаются в запуске и остановке во время запуска и остановки приложения; и они могут хранить некоторое состояние, такое как кэш. Play предоставляет разнообразие механизмов для доступа и использования этих компонентов. Компоненты - не только предоставляются модулями, они могут предоставляются самим приложением.
 
-## Accessing modules
+## Доступ к модулям
 
-One of the earliest decisions that you need to make when starting a new Play project is how you will access the components provided by modules. Components are accessed through the use of a dependency injection mechanism, where rather than having your components look up other components in the system, your components declare what other components they need, and the system injects those components into your components.
+ОДин из наиболее ранних решений, которое вам н необходимо принять, когда начинаете новый проект Play - как вы будете осуществлять доступ к компонентам, предоставляемым модулями. К компонентам можно получить доступ через использования механизма внедрения зависимостей (dependency injection), где в противовес подходу, когда компоненты ищут другие компоненты в системе, ваши компоненты декларируют, какие другие компоненты им нужны, и система внедряет эти компоненты в ваши компоненты.
 
-At its core, Play is agnostic to any particular form of dependency injection, however out of the box Play provides and we recommend that you use [Guice](https://github.com/google/guice). The remainder of this documentation will assume that this is the decision that you have made, however there will be examples of how to integrate with other dependency injection mechanisms.
+Ядро Play индифирентно к любой форме внедрения зависимостей, однако из коробки Play поддерживает и мы рекомендуем вам использовать [Guice](https://github.com/google/guice). Упоминание в этой документации подразумевает, что вы приняли именно это решение, однако будут примеры как интегрировать с другими механизмами внедрения зависимостей.
 
-You can read more about dependency injection in [[Scala|ScalaDependencyInjection]] or [[Java|JavaDependencyInjection]].
+Вы можете прочитать больше о внедрении зависимостей для [[Scala|ScalaDependencyInjection]] или [[Java|JavaDependencyInjection]].

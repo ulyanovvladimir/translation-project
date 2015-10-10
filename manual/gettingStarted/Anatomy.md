@@ -1,108 +1,108 @@
 <!--- Copyright (C) 2009-2015 Typesafe Inc. <http://www.typesafe.com> -->
-# Anatomy of a Play application
+# Анатомия приложения Play
 
-## The Play application layout
+## Макет приложения Play
 
-The layout of a Play application is standardized to keep things as simple as possible. After a first successful compile, a Play application looks like this:
+Макет приложения Play стандртиован чтобы, все было настолько просто, насколько возможно. После первой успешной компиляции приложение Play выглядит так:
 
 ```
-app                      в†’ Application sources
- в”” assets                в†’ Compiled asset sources
-    в”” stylesheets        в†’ Typically LESS CSS sources
-    в”” javascripts        в†’ Typically CoffeeScript sources
- в”” controllers           в†’ Application controllers
- в”” models                в†’ Application business layer
- в”” views                 в†’ Templates
-build.sbt                в†’ Application build script
-conf                     в†’ Configurations files and other non-compiled resources (on classpath)
- в”” application.conf      в†’ Main configuration file
- в”” routes                в†’ Routes definition
-dist                     в†’ Arbitrary files to be included in your projects distribution
-public                   в†’ Public assets
- в”” stylesheets           в†’ CSS files
- в”” javascripts           в†’ Javascript files
- в”” images                в†’ Image files
-project                  в†’ sbt configuration files
- в”” build.properties      в†’ Marker for sbt project
- в”” plugins.sbt           в†’ sbt plugins including the declaration for Play itself
-lib                      в†’ Unmanaged libraries dependencies
-logs                     в†’ Logs folder
- в”” application.log       в†’ Default log file
-target                   в†’ Generated stuff
- в”” resolution-cache      в†’ Info about dependencies
- в”” scala-2.10
-    в”” api                в†’ Generated API docs
-    в”” classes            в†’ Compiled class files
-    в”” routes             в†’ Sources generated from routes
-    в”” twirl              в†’ Sources generated from templates
- в”” universal             в†’ Application packaging
- в”” web                   в†’ Compiled web assets
-test                     в†’ source folder for unit or functional tests
+app                      > Ресурсы приложения
+ L assets                > Компилируемые исходники скриптов и стилей
+    L stylesheets        > Обычно исходники LESS CSS
+    L javascripts        > Обычно исходники CoffeeScript
+ L controllers           > Контроллеры приложения
+ L models                > Бизнес слой приложения
+ L views                 > Шаблоны
+build.sbt                > Скрипт сборки приложения 
+conf                     > Конфигурационные файлы и другие некомпилируемые ресурсы (по classpath)
+ L application.conf      > Главный конфигурационный файл 
+ L routes                > Определение маршрутов
+dist                     > Произвольные файлы для включения в дистрибутив ваших проектов
+public                   > Публичные ресурсы
+ L stylesheets           > CSS файлы
+ L javascripts           > Javascript файлы
+ L images                > Файлы изображений 
+project                  > конфигурационные файлы sbt
+ L build.properties      > Маркер для проекта sbt
+ L plugins.sbt           > sbt плагины, включая подключение самого Play
+lib                      > Библиотеки для включения напрямую, не через ресолверы
+logs                     > папка для журнализации (логов)
+ L application.log       > Журнал по-умолчанию 
+target                   > Сгенерированный код
+ L resolution-cache      > Информация о зависимостях 
+ L scala-2.10
+    L api                > Сгенерированные API docs
+    L classes            > Скомпилированные .class файлы 
+    L routes             > Исходники, сгенерированные из файлов маршрутов
+    L twirl              > Исходники, сгенерированные из шаблонов
+ L universal             > Упаковка приложения 
+ L web                   > Скомпилированные веб активы
+test                     > Директория для исходников модульных и функциональных тестов 
 ```
 
-## The `app/` directory
+## Директория `app/` 
 
-The `app` directory contains all executable artifacts: Java and Scala source code, templates and compiled assetsвЂ™ sources.
+Директория `app` содержит все запускаемые артифакты: исходники Java и Scala, шаблоны и компилируемые исходники активов (скриптов, стилей).
 
-There are three packages in the `app` directory, one for each component of the MVC architectural pattern: 
+Есть три пакета в директории `app`, по одному для каждого компоненты архитектурного паттерна MVC: 
 
 - `app/controllers`
 - `app/models`
 - `app/views`
 
-You can of course add your own packages, for example an `app/utils` package.
+Вы можете, конечно, добавить собственные пакеты, например пакет `app/utils`.
 
-> Note that in Play, the controllers, models and views package name conventions are now just that and can be changed if needed (such as prefixing everything with `com.yourcompany`).
+> Обратите внимание, что в Play, конвенции имен для пакетов контроллеров, моделей и видов теперь всего лишь конвенции и могут быть изменены на все, что вам покажется необходимым (таким как префикс в виде `com.yourcompany`).
 
-There is also an optional directory called `app/assets` for compiled assets such as [LESS sources](http://lesscss.org/) and [CoffeeScript sources](http://coffeescript.org/).
+Еще есть опциональная директория, называемая `app/assets` для компилируемых активов, таких как [LESS исходники](http://lesscss.org/) и [CoffeeScript исходники](http://coffeescript.org/).
 
-## The `public/` directory
+## Директория `public/`
 
-Resources stored in the `public` directory are static assets that are served directly by the Web server.
+Ресурсы, сохраняемые в директории `public` являются статическими активами, которые отдаются Веб-сервером напрямую.
 
-This directory is split into three sub-directories for images, CSS stylesheets and JavaScript files. You should organize your static assets like this to keep all Play applications consistent.
+Эта директория разделена на три поддиректории для изображений, CSS таблиц стилей и JavaScript файлов. Вы должны организовать ваши статические активы подобным образом, чтобы держать все Play приложения целостными.
 
-> In a newly-created application, the `/public` directory is mapped to the `/assets` URL path, but you can easily change that, or even use several directories for your static assets.
+> Во вновь созданном приложении директория `/public` отображается в `/assets` путь URL, но вы можете легко изменить это, или даже использовать различные директории для ваших статических активов. 
 
-## The `conf/` directory
+## Директория `conf/`
 
-The `conf` directory contains the applicationвЂ™s configuration files. There are two main configuration files:
+Директория `conf` содержит конфигурационные файлы приложения. Есть два главных конфигурационных файла:
 
-- `application.conf`, the main configuration file for the application, which contains configuration parameters
-- `routes`, the routes definition file.
+- `application.conf`, главный конфигурационный файл для приложения, который содержит параметры конфигурации
+- `routes`, файл определения маршрутов.
 
-If you need to add configuration options that are specific to your application, itвЂ™s a good idea to add more options to the `application.conf` file.
+Если вам необходимо добавить опции конфигурациии, специфичные для вашего приложения, хорошая идея добавить больше опций в файл `application.conf`.
 
-If a library needs a specific configuration file, try to file it under the `conf` directory.
+Если библиотека требует специфический конфигурационный файл, попытайтесь вынести его в файл в поддиректории `conf`.
 
-## The `lib/` directory
+## Директория `lib/`
 
-The `lib` directory is optional and contains unmanaged library dependencies, ie. all JAR files you want to manually manage outside the build system. Just drop any JAR files here and they will be added to your application classpath.
+Директория `lib` является необязательной и содержит библиотеки, подключаемыми не через механизм разрешения управляемых зависимостей, т.е. все JAR файлы, которые вы захотите добавить вручную вне рамок системы автоматизированной сборки. Просто киньте любые JAR файлы сюда и они будут добавлены в classpath вашего приложения .
 
-## The `build.sbt` file
+## Файл `build.sbt`
 
-Your project's main build declarations are generally found in `build.sbt` at the root of the project. `.scala` files in the `project/` directory can also be used to declare your project's build.
+Главные положения сборки вашего проекта обычно расположены `build.sbt`, в корне проекта. `.scala` файлы в директории `project/` также могут быть использованы, чтобы сконфигурировать сборку вашего проекта.
 
-## The `project/` directory
+## Директория `project/`
 
-The `project` directory contains the sbt build definitions:
+Директория `project` содержит определения для сборки через:
 
-- `plugins.sbt` defines sbt plugins used by this project
-- `build.properties` contains the sbt version to use to build your app.
+- `plugins.sbt` определяет sbt плагины, используемые в этом проекте
+- `build.properties` содержит версию sbt, которая должна использоваться для сборки вашего приложения.
 
-## The `target/` directory
+## Директория `target/`
 
-The `target` directory contains everything generated by the build system. It can be useful to know what is generated here.
+Директория `target` содержит все, сгенерированное с помощью системые сборки. Это может быть полезно, чтобы узнать, что же было сгенерировано.
 
-- `classes/` contains all compiled classes (from both Java and Scala sources).
-- `classes_managed/` contains only the classes that are managed by the framework (such as the classes generated by the router or the template system). It can be useful to add this class folder as an external class folder in your IDE project.
-- `resource_managed/` contains generated resources, typically compiled assets such as LESS CSS and CoffeeScript compilation results.
-- `src_managed/` contains generated sources, such as the Scala sources generated by the template system.
-- `web/` contains assets processed by [sbt-web](https://github.com/sbt/sbt-web#sbt-web) such as those from the `app/assets` and `public` folders.
+- `classes/` содержит все скомпилированные классы (из Java и Scala исходников).
+- `classes_managed/` содержит только классы, управляемые фреймворком  (такие как классы, сгенерированные маршрутизатором или системой шаблонов). Может быть полезно добавить эту папку в качестве внешней папки классов в проект вашей IDE.
+- `resource_managed/` содержит сгенерированные ресурсы, обычно скомпилированные активы, такие как результаты компиляции LESS CSS и CoffeeScript.
+- `src_managed/` содержит сгенерированные исходники, такие как Scala исходоники, сгенерированные системой шаблонов.
+- `web/` содержит активы, обработанные с помощью [sbt-web](https://github.com/sbt/sbt-web#sbt-web) , такие как компилируемые исходники активов из папок `app/assets` и `public`.
 
-## Typical `.gitignore` file
+## Типовой `.gitignore` файл
 
-Generated folders should be ignored by your version control system. Here is the typical `.gitignore` file for a Play application:
+Созданные папки должны игнорироваться вашей системой контроля версий. Здесь типовой `.gitignore` файл для приложения Play:
 
 ```txt
 logs
@@ -113,48 +113,48 @@ tmp
 dist
 .cache
 ```
+## SBT макет по-умолчанию
 
-## Default SBT layout
-
-You also have the option of using the default layout used by SBT and Maven. Please note that this layout is experimental and may have issues. In order to use this layout, use `disablePlugins(PlayLayoutPlugin)`. This will stop Play from overriding the default SBT layout, which looks like this:
+У вас также есть возможность использования макета по умолчанию, используемого SBT или Maven. Пожалуйста, обратите внимание, что это макет экспериментальный и может иметь баги. Для того чтобы использовать этот макет, используйте `disablePlugins(PlayLayoutPlugin)`. Это остановит Play от перекрывания SBT макета по-умолчанию, который выглядит следующим образом:
 
 ```
-build.sbt                  в†’ Application build script
-src                        в†’ Application sources
- в”” main                    в†’ Compiled asset sources
-    в”” java                 в†’ Java sources
-       в”” controllers       в†’ Java controllers
-       в”” models            в†’ Java business layer
-    в”” scala                в†’ Scala sources
-       в”” controllers       в†’ Scala controllers
-       в”” models            в†’ Scala business layer
-    в”” resources            в†’ Configurations files and other non-compiled resources (on classpath)
-       в”” application.conf  в†’ Main configuration file
-       в”” routes            в†’ Routes definition
-    в”” twirl                в†’ Templates
-    в”” assets               в†’ Compiled asset sources
-       в”” css               в†’ Typically LESS CSS sources
-       в”” js                в†’ Typically CoffeeScript sources
-    в”” public               в†’ Public assets
-       в”” css               в†’ CSS files
-       в”” js                в†’ Javascript files
-       в”” images            в†’ Image files
- в”” test                    в†’ Unit or functional tests
-    в”” java                 в†’ Java source folder for unit or functional tests
-    в”” scala                в†’ Scala source folder for unit or functional tests
-    в”” resources            в†’ Resource folder for unit or functional tests
- в”” universal               в†’ Arbitrary files to be included in your projects distribution
-project                    в†’ sbt configuration files
- в”” build.properties        в†’ Marker for sbt project
- в”” plugins.sbt             в†’ sbt plugins including the declaration for Play itself
-lib                        в†’ Unmanaged libraries dependencies
-logs                       в†’ Logs folder
- в”” application.log         в†’ Default log file
-target                     в†’ Generated stuff
- в”” scala-2.10.0            
-    в”” cache              
-    в”” classes              в†’ Compiled class files
-    в”” classes_managed      в†’ Managed class files (templates, ...)
-    в”” resource_managed     в†’ Managed resources (less, ...)
-    в”” src_managed          в†’ Generated sources (templates, ...)
+build.sbt                  > Скрипт сборки приложения
+src                        > Исходники приложения
+ L main                    > Компилируемые активы
+    L java                 > исходники Java
+       L controllers       > Java контроллеры
+       L models            > Java бизнес слой
+    L scala                > Scala исходники
+       L controllers       > Scala контроллерыё
+       L models            > Scala бизнес слой
+    L resources            > Конфигурационные файлы и другие некомпилируемые ресурсы (по classpath)
+       L application.conf  > Главный конфигурационный файл
+       L routes            > Определение маршрутов
+    L twirl                > Шаблоны
+    L assets               > Компилируемые исходники активов
+       L css               > Обычно LESS CSS исходники
+       L js                > Обычно CoffeeScript исходники
+    L public               > Публичные активы
+       L css               > CSS файлы
+       L js                > Javascript файлы
+       L images            > Файлы изображений
+ L test                    > Модульные или фнкциональные тесты
+    L java                 > папка для Java исходников модульных и функциональных тестов
+    L scala                > папка для исходников Scala модульных и функциональных тестов
+    L resources            > папка ресурсов для модульных и функциональных тестов
+ L universal               > Произвольные файлы для включения в дистрибутив вашего проекта
+project                    > файлы конфигурации sbt
+ L build.properties        > Маркер для sbt проекта
+ L plugins.sbt             > sbt плагины, включая объявление самого Play
+lib                        > Библиотеки, подключаемые напрямую 
+logs                       > Папка для Журналов (Логов)
+ L application.log         > Журнал по-умолчанию
+target                     > Сгенерированная всячина
+ L scala-2.10.0            
+    L cache              
+    L classes              > Скомпилированные class файлы
+    L classes_managed      > Управляемые class файлы (шаблоны, ...)
+    L resource_managed     > Управляемые ресурсы (less, ...)
+    L src_managed          > Сгенерированные исходники (шаблоны, ...)
 ```
+
