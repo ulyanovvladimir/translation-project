@@ -1,0 +1,4 @@
+DeployingCloud:Развертывание в облачном сервисе
+ProductionHeroku:Развертывание в Heroku
+Deploying-CloudFoundry:Развертывание в Cloud Foundry
+Deploying-CleverCloud:Развертывание в Clever Cloud
