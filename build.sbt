@@ -1,4 +1,4 @@
-name := """playframework-manual-ru"""
+name := """manual"""
 
 version := "1.0-SNAPSHOT"
 
