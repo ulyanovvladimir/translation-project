@@ -1,0 +1,5 @@
+Assets:Работа с публичными активами
+AssetsCoffeeScript:Использование CoffeeScript
+AssetsLess:Использование LESS CSS
+AssetsJSHint:Использование JSHint
+RequireJS-support:Использование RequireJs
