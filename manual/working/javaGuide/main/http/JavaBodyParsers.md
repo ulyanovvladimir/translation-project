@@ -1,117 +1,117 @@
 <!--- Copyright (C) 2009-2015 Typesafe Inc. <http://www.typesafe.com> -->
-# Body parsers
+# Body парсеры
 
-## What is a body parser?
+## Что такое body-парсер?
 
-An HTTP request is a header followed by a body.  The header is typically small - it can be safely buffered in memory, hence in Play it is modelled using the [`RequestHeader`](api/java/play/mvc/Http.RequestHeader.html) class.  The body however can be potentially very long, and so is not buffered in memory, but rather is modelled as a stream.  However, many request body payloads are small and can be modelled in memory, and so to map the body stream to an object in memory, Play provides a [`BodyParser`](api/java/play/mvc/BodyParser.html) abstraction.
+HTTP запрос - это заголовок, за которым следует тело.  Заголовок обычно мал - он может быть безопасно буфферизирован в памяти, в Play это смоделировано с помощью класса [`RequestHeader`](api/java/play/mvc/Http.RequestHeader.html). Тело же потенциальо может быть очень длинным, и поэтому не буфферизируется в памяти, но в отличие от заголовка, оно смоделировано как поток(stream). Однако, много тел запросов на самом деле небольшие и могут быть смоделированы в памяти, поэтому для того чтобы отобразить поток в объект, хранящийся в памяти, Play предоставляет абстракцию[`BodyParser`](api/java/play/mvc/BodyParser.html).
 
-Since Play is an asynchronous framework, the traditional `InputStream` can't be used to read the request body - input streams are blocking, when you invoke `read`, the thread invoking it must wait for data to be available.  Instead, Play uses an asynchronous streaming library called [Akka streams](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/java.html).  Akka streams is an implementation of [Reactive Streams](http://www.reactive-streams.org/), a SPI that allows many asynchronous streaming APIs to seamlessly work together, so though traditional `InputStream` based technologies are not suitable for use with Play, Akka streams and the entire ecosystem of asynchronous libraries around Reactive Streams will provide you with everything you need.
+Поскольку Play - это асинхронный фреймворк, традиционный InputStream не может быть использован для чтения тела запроса, поскольку он блокирующий: когда вы вызываете метод `read`, тред, вызывающий его должен ждать полученных данных. Вместо этого, Play использует библиотеку асинхронной поточности, известную как [Akka streams](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/java.html).  Akka streams  - это реализация [Реактивных потоков](http://www.reactive-streams.org/), SPI, которое позволяет многим API асинхронной поточности работать совместно, так что традиционные технологии, базирующиеся на `InputStream` не подходят для использования в Play.  Akka потоки и вся экосистема асинхронных библиотек вокруг Реактивных Потоков предоставит вам все, что необходимо.
 
-## Using the built in body parsers
+## Использование встроенных body-парсеров
 
-Most typical web apps will not need to use custom body parsers, they can simply work with Play's built in body parsers.  These include parsers for JSON, XML, forms, as well as handling plain text bodies as Strings and byte bodies as `ByteString`.
+Самые типовые веб-приложения не будут нуждаться в особых body-парсерах, они могут просто работать со встроенными в Play. К ним относятся парсеры для JSON, XML, форм, также как и парсеры обработки тел, представляющих собой текст в виде строку или последовательности байтов в виде `ByteString`.
 
-### The default body parser
+### Body-парсер по умолчанию
 
-The default body parser that's used if you do not explicitly select a body parser will look at the incoming `Content-Type` header, and parses the body accordingly.  So for example, a `Content-Type` of type `application/json` will be parsed as a `JsonNode`, while a `Content-Type` of `application/x-form-www-urlencoded` will be parsed as a `Map<String, String[]>`.
+Body-парсер по умолчанию, который должен использоваться, в случае если вы явно не указали, будет браться из входящего заголовка `Content-Type` и парсить тело соответственно. Так, например `Content-Type` типа `application/json` будет парситься как `JsonNode`, тогда как `Content-Type` вида `application/x-form-www-urlencoded` будет парситься как `Map<String, String[]>`.
 
-The request body can be accessed through the `body()` method on [`Request`](api/java/play/mvc/Http.Request.html), and is wrapped in a [`RequestBody`](api/java/play/mvc/Http.RequestBody.html) object, which provides convenient accessors to the various types that the body could be.  For example, to access a JSON body:
+Тело запроса может быть доступно с помощью метода `body()` класса [`Request`](api/java/play/mvc/Http.Request.html), и обернуто в объект [`RequestBody`](api/java/play/mvc/Http.RequestBody.html), который предоставляет удобные методы доступа к различным типам тела запроса. Например, чтобы получить доступ к телу JSON:
 
 @[access-json-body](code/javaguide/http/JavaBodyParsers.java)
 
-The following is a mapping of types supported by the default body parser:
+Ниже - отображение типов, поддерживаемых body-парсером по умолчанию:
 
-- **text/plain**: `String`, accessible via `asText()`.
-- **application/json**: `com.fasterxml.jackson.databind.JsonNode`, accessible via `asJson()`.
-- **application/xml**, **text/xml** or **application/XXX+xml**: `org.w3c.Document`, accessible via `asXml()`.
-- **application/form-url-encoded**: `Map<String, String[]>`, accessible via `asFormUrlEncoded()`.
-- **multipart/form-data**: [`MultipartFormData`](api/java/play/mvc/Http.MultipartFormData.html), accessible via `asMultipartFormData()`.
-- Any other content type: [`RawBuffer`](api/java/play/mvc/Http.RawBuffer.html), accessible via `asRaw()`.
+- **text/plain**: `String`, доступно через `asText()`.
+- **application/json**: `com.fasterxml.jackson.databind.JsonNode`, доступно через `asJson()`.
+- **application/xml**, **text/xml** or **application/XXX+xml**: `org.w3c.Document`, доступно через `asXml()`.
+- **application/form-url-encoded**: `Map<String, String[]>`, доступно через `asFormUrlEncoded()`.
+- **multipart/form-data**: [`MultipartFormData`](api/java/play/mvc/Http.MultipartFormData.html), доступно через `asMultipartFormData()`.
+- Any other content type: [`RawBuffer`](api/java/play/mvc/Http.RawBuffer.html), доступно через `asRaw()`.
 
-The default body parser, for performance reasons, won't attempt to parse the body if the request method is not defined to have a meaningful body, as defined by the HTTP spec.  This means it only parses bodies of `POST`, `PUT` and `PATCH` requests, but not `GET`, `HEAD` or `DELETE`.  If you would like to parse request bodies for these methods, you can use the `AnyContent` body parser, described [below](#Choosing-an-explicit-body-parser).
+Body-парсер по умолчанию, в целях производительности не будет пытаться парсить тело в случае , если метод запроса не определяет значимого тела, как определено в спецификации HTTP. Это означает, что он парсит только тела запросов `POST`, `PUT` и `PATCH` , но не `GET`, `HEAD` или `DELETE`. Если вам нужно распарсить тела запросов с этими методами, вы можете использовать body-парсер `AnyContent`, описанный [ниже](#Choosing-an-explicit-body-parser).
 
-### Choosing an explicit body parser
+### Явный выбор body-парсера
 
-If you want to explicitly select a body parser, this can be done using the [`@BodyParser.Of`](api/java/play/mvc/BodyParser.Of.html) annotation, for example:
+Если вы хотите явно выбрать body-парсер, это может быть сделано с помощью аннотации [`@BodyParser.Of`](api/java/play/mvc/BodyParser.Of.html), например:
 
 @[particular-body-parser](code/javaguide/http/JavaBodyParsers.java)
 
-The body parsers that Play provides out of the box are all inner classes of the [`BodyParser`](api/java/play/mvc/BodyParser.html) class.  Briefly, they are:
+Body-парсеры, которые предоставляет Play из коробки являются внутренними классами класса [`BodyParser`](api/java/play/mvc/BodyParser.html). Если кратко, то вот они:
 
-- [`Default`](api/java/play/mvc/BodyParser.Default.html): The default body parser.
-- [`AnyContent`](api/java/play/mvc/BodyParser.AnyContent.html): Like the default body parser, but will parse bodies of `GET`, `HEAD` and `DELETE` requests.
-- [`Json`](api/java/play/mvc/BodyParser.Json.html): Parses the body as JSON.
-- [`TolerantJson`](api/java/play/mvc/BodyParser.TolerantJson.html): Like `Json`, but does not validate that the `Content-Type` header is JSON.
-- [`Xml`](api/java/play/mvc/BodyParser.Xml.html): Parses the body as XML.
-- [`TolerantXml`](api/java/play/mvc/BodyParser.TolerantXml.html): Like `Xml`, but does not validate that the `Content-Type` header is XML.
-- [`Text`](api/java/play/mvc/BodyParser.Text.html): Parses the body as a String.
-- [`TolerantText`](api/java/play/mvc/BodyParser.TolerantText.html): Like `Text`, but does not validate that the `Content-Type` is `text/plain`.
-- [`Bytes`](api/java/play/mvc/BodyParser.Bytes.html): Parses the body as a `ByteString`.
-- [`Raw`](api/java/play/mvc/BodyParser.Raw.html): Parses the body as a `RawBuffer`.  This will attempt to store the body in memory, up to Play's configured memory buffer size, but fallback to writing it out to a `File` if that's exceeded.
-- [`FormUrlEncoded`](api/java/play/mvc/BodyParser.FormUrlEncoded.html): Parses the body as a form.
-- [`MultipartFormData`](api/java/play/mvc/BodyParser.MultipartFormData.html): Parses the body as a multipart form, storing file parts to files.
-- [`Empty`](api/java/play/mvc/BodyParser.Empty.html): Does not parse the body, rather it ignores it.
+- [`Default`](api/java/play/mvc/BodyParser.Default.html): Парсер по умолчанию.
+- [`AnyContent`](api/java/play/mvc/BodyParser.AnyContent.html): Также как парсер по умолчанию, но будет парсить тела запросов `GET`, `HEAD` и `DELETE`.
+- [`Json`](api/java/play/mvc/BodyParser.Json.html): Парсит тело как JSON.
+- [`TolerantJson`](api/java/play/mvc/BodyParser.TolerantJson.html): Как и `Json`, но не проводит валидацию, что заголовок `Content-Type` является JSON.
+- [`Xml`](api/java/play/mvc/BodyParser.Xml.html): Парсит тело в формате XML.
+- [`TolerantXml`](api/java/play/mvc/BodyParser.TolerantXml.html): Как и `Xml`, но не проверяет, что заголовок `Content-Type` соответствует XML.
+- [`Text`](api/java/play/mvc/BodyParser.Text.html): Парсит тело как строку String.
+- [`TolerantText`](api/java/play/mvc/BodyParser.TolerantText.html): Как и `Text`, но не проверяет, что заголовок `Content-Type` является `text/plain`.
+- [`Bytes`](api/java/play/mvc/BodyParser.Bytes.html): Парсит тело в `ByteString`.
+- [`Raw`](api/java/play/mvc/BodyParser.Raw.html): Парсит тело в `RawBuffer`. Этот класс попытается сохранить тело в памяти, вплоть до размера паяти, сконфигурированого размером буффера Play, но в случае неудачи запишет его в `File`.
+- [`FormUrlEncoded`](api/java/play/mvc/BodyParser.FormUrlEncoded.html): Парсит тело формы.
+- [`MultipartFormData`](api/java/play/mvc/BodyParser.MultipartFormData.html): Парсит тело multipart формы, сохраняя части в файлы.
+- [`Empty`](api/java/play/mvc/BodyParser.Empty.html): Не парсит тело, просто игнорирует его.
 
-### Content length limits
+### Ограничения длины Контента
 
-Most of the built in body parsers buffer the body in memory, and some buffer it on disk.  If the buffering was unbounded, this would open up a potential vulnerability to malicious or careless use of the application.  For this reason, Play has two configured buffer limits, one for in memory buffering, and one for disk buffering.
+Большинство встроенных body-парсеров буфферизирует тело в памяти, и некоторые буфферизируют его на диск. Если буфферизация неограничена, это может быть потенциальной уязвимостью для подозрительного или беспечного использования приложения. По этой причине, Play имеет два конфигурируемых лимита буффера, один для буфферизаии в памяти, и второя для дисковой буфферизации.
 
-The memory buffer limit is configured using `play.http.parser.maxMemoryBuffer`, and defaults to 100KB, while the disk buffer limit is configured using `play.http.parser.maxDiskBuffer`, and defaults to 10MB.  These can both be configured in `application.conf`, for example, to increase the memory buffer limit to 256KB:
+Лимит для буффера в памяти конфигурируется с помощью `play.http.parser.maxMemoryBuffer`, и по умолчанию равен 100KB, тогда как дисковый буффер конфигурируется с помощью `play.http.parser.maxDiskBuffer`, и по-умолчанию равен 10MB.  Оба они могут быть сконфигурированы в `application.conf`, например, для увеличения лимита буффера памяти до 256KB:
 
     play.http.parser.maxMemoryBuffer = 256kb
     
-You can also limit the amount of memory used on a per action basis by writing a custom body parser, see [below](#Writing-a-custom-max-length-body-parser) for details.
+Вы также можете ограничить количество памяти, исспользуемой на уровне контроллера, написав собственный body-парсер, см. [ниже](#Writing-a-custom-max-length-body-parser) для подробной информации.
 
-## Writing a custom body parser
+## Написание собственного body-парсера
 
-A custom body parser can be made by implementing the [`BodyParser`](api/java/play/mvc/BodyParser.html) class.  This class has one abstract method:
+Собственный body-парсер может быть создан, реализовав класс [`BodyParser`](api/java/play/mvc/BodyParser.html).  Этот класс имеет один абстрактный метод:
 
 @[body-parser-apply](code/javaguide/http/JavaBodyParsers.java)
 
-The signature of this method may be a bit daunting at first, so let's break it down.
+Сигнатура этого метода может показаться для начала несколько пугающей, поэтому давайте разберемся.
 
-The method takes a [`RequestHeader`](api/java/play/mvc/Http.RequestHeader.html).  This can be used to check information about the request - most commonly, it is used to get the `Content-Type`, so that the body can be correctly parsed.
+Этот метод принимает [`RequestHeader`](api/java/play/mvc/Http.RequestHeader.html). Он может быть использован чтобы проверить информацию о запросе - чаще всего, он используется чтобы получить `Content-Type`, чтобы тело запроса было корректно распарсено.
 
-The return type of the method is an [`Accumulator`](api/java/play/libs/streams/Accumulator.html).  An accumulator is a thin layer around an [Akka streams](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/java.html) [`Sink`](http://doc.akka.io/japi/akka-stream-and-http-experimental/1.0/akka/stream/javadsl/Sink.html).  An accumulator asynchronously accumulates streams of elements into a result, it can be run by passing in an Akka streams [`Source`](http://doc.akka.io/japi/akka-stream-and-http-experimental/1.0/akka/stream/javadsl/Source.html), this will return a `CompletionStage` that will be redeemed when the accumulator is complete.  It is essentially the same thing as a `Sink<E, CompletionStage<A>>`, in fact it is nothing more than a wrapper around this type, but the big difference is that `Accumulator` provides convenient methods such as `map`, `mapFuture`, `recover` etc. for working with the result as if it were a promise, where `Sink` requires all such operations to be wrapped in a `mapMaterializedValue` call.
+Типом результата данного метода является [`Accumulator`](api/java/play/libs/streams/Accumulator.html).  Аккумулятор - это тонкий слой поверх [Akka streams](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/java.html) [`Sink`](http://doc.akka.io/japi/akka-stream-and-http-experimental/1.0/akka/stream/javadsl/Sink.html).  Аккумулятор асинхронно аккумулирует потоки элементов в результат, Поэтому он может быть запущен через передачу в Akka потоки [`Source`](http://doc.akka.io/japi/akka-stream-and-http-experimental/1.0/akka/stream/javadsl/Source.html), это вернет `CompletionStage`, который будет искуплен, когда аккумулятор завершится. Это в точности та же вещь, как и `Sink<E, CompletionStage<A>>`, фактически это ничего более чем обертка вокруг этого типа, большая разница в том, что `Accumulator` предоставляет удобные методы, такие как `map`, `mapFuture`, `recover` и т.д. для работы с результатом, как если бы он был обещанием, где `Sink` требует оборачивать все такие операции в вызов `mapMaterializedValue`.
 
-The accumulator that the `apply` method returns consumes elements of type [`ByteString`](http://doc.akka.io/japi/akka/2.3.10/akka/util/ByteString.html) - these are essentially arrays of bytes, but differ from `byte[]` in that `ByteString` is immutable, and many operations such as slicing and appending happen in constant time.
+Аккумулятор, который  применяет (`apply`) метод, возвращает потребляет элементы типа [`ByteString`](http://doc.akka.io/japi/akka/2.3.10/akka/util/ByteString.html) - они в сущности являются массивами байтов, но отличаются от `byte[]` тем, что `ByteString` неизменяемый, и многие операции, такие как слайсинг или дописывание выполняются за фиксированное время.
 
-The return type of the accumulator is `F.Either<Result, A>`.  This says it will either return a `Result`, or it will return a body of type `A`.  A result is generally returned in the case of an error, for example, if the body failed to be parsed, if the `Content-Type` didn't match the type that the body parser accepts, or if an in memory buffer was exceeded.  When the body parser returns a result, this will short circuit the processing of the action - the body parsers result will be returned immediately, and the action will never be invoked.
+Тип возвращаемого значения для аккумулятора - `F.Either<Result, A>`. Это говорит, что либо вернется `Result`, либо вернется тело типа `A`. Результат A обычно возвращается в случае ошибки, например, если тело не удалось пропарсить, если `Content-Type` не совпадал с типом, который принимает body-парсер, или если был исчерпан буффер в памяти. Когда body-парсер возвращает результат, это сократит круг обработки контроллера - результат body-парсера будет немедленно возвращен и действие никогда не будет вызвано.
 
-### Composing an existing body parser
+### Написание существующего body-парсера
 
-As a first example, we'll show how to compose an existing body parser.  Let's say you want to parse some incoming JSON into a class that you have defined, called `Item`.
+В качестве первого примера мы покажем как написать существующий body-парсер. Скажем, вы хотите парсить входящий JSON в класс, который вы описали и назвали `Item`.
 
-First we'll define a new body parser that depends on the JSON body parser:
+Для начала определим новый body-парсер , который зависит от JSON body-парсера:
 
 @[composing-class](code/javaguide/http/JavaBodyParsers.java)
 
-Now, in our implementation of the `apply` method, we'll invoke the JSON body parser, which will give us back the `Accumulator<ByteString, F.Either<Result, JsonNode>>` to consume the body.  We can then map that like a promise, to convert the parsed `JsonNode` body to a `User` body.  If the conversion fails, we return a `Left` of a `Result` saying what the error was:
+Теперь, в нашей реализации метода `apply`, мы запустим JSON body-парсер, который выдаст нам `Accumulator<ByteString, F.Either<Result, JsonNode>>` чтобы употребить тело. Мы затем можем отобразить его как обещание чтобы сконвертировать распарсенное тело `JsonNode` в тело `User`. Если преобразование провалится, мы вернем `Left` результата `Result`, говоря о том, что была ошибка:
 
 @[composing-apply](code/javaguide/http/JavaBodyParsers.java)
 
-The returned body will be wrapped in a `RequestBody`, and can be accessed using the `as` method:
+Возвращаемое тело будет обернуто в `RequestBody`, и может быть доступно с помощью метода `as`:
 
 @[composing-access](code/javaguide/http/JavaBodyParsers.java)
 
-### Writing a custom max length body parser
+### Написание парсера особой максимального размера
 
-Another use case may be to define a body parser that uses a custom maximum length for buffering.  Many of the built in Play body parsers are designed to be extended to allow overriding the buffer length in this way, for example, this is how the text body parser can be extended:
+Другой кейс использования парсеров может быть в определении парсера, который переопределяет максимальную длину буфферизации. Много встроенных в Play body-парсеров рарзаботаны расширяемыми чтобы позволить перекрывание длины буффера, например, как можно расширить body-парсер для текста:
 
 @[max-length](code/javaguide/http/JavaBodyParsers.java)
 
-### Directing the body elsewhere
+### Перенаправление тела куда-либо
 
-So far we've shown extending and composing the existing body parsers.  Sometimes you may not actually want to parse the body, you simply want to forward it elsewhere.  For example, if you want to upload the request body to another service, you could do this by defining a custom body parser:
+Итак, мы показали расширение и написание существующих body-парсеров. Иногда вы возможно на самом деле не захотите парсить тело, вы просто хотите перенаправить его куда-либо. Например, если вы хотите загрузить тело запроса ну другой сервис, вы могли бы сделать это определив собственный body-парсер:
 
 @[forward-body](code/javaguide/http/JavaBodyParsers.java)
 
-### Custom parsing using Akka streams
+### Собственный парсинг использующий  Akka streams
 
-In rare circumstances, it may be necessary to write a custom parser using Akka streams.  In most cases it will suffice to buffer the body in a `ByteString` first, by composing the `Bytes` parser as described [above](#Composing-an-existing-body-parser), this will typically offer a far simpler way of parsing since you can use imperative methods and random access on the body.
+В редких случаях, возможно понадобится написать собственный парсер, используя Akka streams. В большинстве случаев будет достаточно  сначала буферизировать тело в  `ByteString`, написав `Bytes` парсер, как рассказано [выше](#Composing-an-existing-body-parser), Обычно это предоставляет более простой способ парсинга, т.к. вы можете использовать императивные методы и произвольный доступ к телу.
 
-However, when that's not feasible, for example when the body you need to parse is too long to fit in memory, then you may need to write a custom body parser.
+Однако, когда это не достижимо, например, когда тело, которое надо распарсить слишком длинное, чтобы уместиться в па мяти, тогда возможно вам потребуется написать собственный парсер.
 
-A full description of how to use Akka streams is beyond the scope of this documentation - the best place to start is to read the [Akka streams documentation](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/java.html).  However, the following shows a CSV parser, which builds on the [Parsing lines from a stream of ByteStrings](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/java/stream-cookbook.html#Parsing_lines_from_a_stream_of_ByteStrings) documentation from the Akka streams cookbook:
+Полное описание того как использовать Akka streams выходит за рамки этой докумментации - наилучшее место для начала - прочитать [Документацию по Akka streams](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/java.html).  Однако, далее показан CSV парсер, который строится на [Парсинге строк из потока ByteString](http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/java/stream-cookbook.html#Parsing_lines_from_a_stream_of_ByteStrings) докумментации из Akka streams рецептов:
 
 @[csv](code/javaguide/http/JavaBodyParsers.java)
