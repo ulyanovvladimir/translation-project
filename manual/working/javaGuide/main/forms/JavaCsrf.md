@@ -1,62 +1,62 @@
 <!--- Copyright (C) 2009-2015 Typesafe Inc. <http://www.typesafe.com> -->
 # Защита от Cross Site Request Forgery
 
-Cross Site Request Forgery (CSRF) is a security exploit where an attacker tricks a victim's browser into making a request using the victim's session.  Since the session token is sent with every request, if an attacker can coerce the victim's browser to make a request on their behalf, the attacker can make requests on the user's behalf.
+Cross Site Request Forgery (CSRF) это способ проникновения, когда атакующий принуждает браузер жертвы сделать запрос, использующий сессию жертвы. Так как токен сессии отправляется в каждом запросе, если атакующий сможет принудить браузер жертвы выполнить запрос от своего лица, атакующий может выполнить запрос от лица пользователя. 
 
-It is recommended that you familiarise yourself with CSRF, what the attack vectors are, and what the attack vectors are not.  We recommend starting with [this information from OWASP](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29).
+Рекомендуется узнать поближе, что такое CSRF, какие векторы атаки, и что ими не является. Мы рекомендуем начать с [этой информации от OWASP](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29)
 
-Simply put, an attacker can coerce a victim's browser to make the following types of requests:
+Проще говоря, атакующий может вынудить браузер жертвы выполнить следующие типы запросов:
 
-* All `GET` requests
-* `POST` requests with bodies of type `application/x-www-form-urlencoded`, `multipart/form-data` and `text/plain`
+* Все `GET` запросы
+* `POST` запросы с телом типа `application/x-www-form-urlencoded`, `multipart/form-data` и `text/plain`
 
-An attacker can not:
+Атакующий не может:
 
-* Coerce the browser to use other request methods such as `PUT` and `DELETE`
-* Coerce the browser to post other content types, such as `application/json`
-* Coerce the browser to send new cookies, other than those that the server has already set
-* Coerce the browser to set arbitrary headers, other than the normal headers the browser adds to requests
+* Вынудить браузер использовать другие методы запроса, такие как `PUT` and `DELETE`
+* Вынудить браузер отправить POST других типов контента, таких как `application/json`
+* Вынудить браузер отправить новые куки, отличные от тех, которые сервер уже выставил.
+* Вынудить браузер установить произвольные заголовки, отличные от нормальных заголовков, которые браузер добавляет к запросам. 
 
-Since `GET` requests are not meant to be mutative, there is no danger to an application that follows this best practice.  So the only requests that need CSRF protection are `POST` requests with the above mentioned content types.
+Так как предполагается, что `GET` запросы не приводят к изменениям, нет опасности для приложений, которые используют эту практику. Поэтому единственные запросы, которые нуждаются в CSRF защите - это `POST` запросы с указанными выше типами контента.
 
-### Play's CSRF protection
+### Защита от  CSRF в Play  
 
-Play supports multiple methods for verifying that a request is not a CSRF request.  The primary mechanism is a CSRF token.  This token gets placed either in the query string or body of every form submitted, and also gets placed in the user's session.  Play then verifies that both tokens are present and match.
+Play поддерживает множество методов для верификации того, что запрос не является CSRF запросом. Главный механизм - это CSRF токен. Этот токен размещается либо в строке запроса или в теле каждой отправляемой формы, и также размещается в пользовательской сессии. Play затем верифицирует оба этих токена и проверяет их соответствие.
 
-To allow simple protection for non browser requests, such as requests made through AJAX, Play also supports the following:
+Чтобы предоставить простую защиту от не браузерных запросов, таких как запросы, выполняемые через AJAX, Play также предоставляет следующее:
 
-* If an `X-Requested-With` header is present, Play will consider the request safe.  `X-Requested-With` is added to requests by many popular Javascript libraries, such as jQuery.
-* If a `Csrf-Token` header with value `nocheck` is present, or with a valid CSRF token, Play will consider the request safe.
+* Если присутствует заголовок `X-Requested-With`, Play рассматривает запрос как безопасный.  `X-Requested-With` добавляется в запрос многими популярными Javascript библиотеками, такими как jQuery.
+* Если присутствует заголовок `Csrf-Token` со значением `nocheck`, или с валидным CSRF токеном, Play будет рассматривать этот запрос как безопасный.
 
-## Applying a global CSRF filter
+## Применение глобального CSRF фильтра
 
-Play provides a global CSRF filter that can be applied to all requests.  This is the simplest way to add CSRF protection to an application.  To enable the global filter, add the Play filters helpers dependency to your project in `build.sbt`:
+Play предоставляет глобальный CSRF фильтр, который не может быть применен ко всем запросам. Это простейший способ добавить CSRF защиту в приложение. Чтобы включить глобальный фильтр, добавте зависимость от фильтров-хелперов Play в ваш проект в файле `build.sbt`:  
 
 ```scala
 libraryDependencies += filters
 ```
 
-Now add them to your `Filters` class:
+Теперь добавьте их в ваш класс `Filters` :
 
 @[filters](code/javaguide/forms/csrf/Filters.java)
 
-The `Filters` class can either be in the root package, or if it has another name or is in another package, needs to be configured using `play.http.filters` in `application.conf`:
+Класс `Filters` может быть либо в корне пакета, либо, если он имеет другое имя или находится в другом пакете, должен быть сконфигурирован с помощью `play.http.filters` в `application.conf`:
 
 ```
 play.http.filters = "filters.MyFilters"
 ```
 
-### Getting the current token
+### Получение текущего токена
 
-The current CSRF token can be accessed using the `CSRF.getToken` method.  It takes a `RequestHeader`, which can be obtained by calling `Controllers.request()`:
+Текущий CSRF токен может быть доступен с помощью метода `CSRF.getToken`.  Он принимает `RequestHeader`, который может быть получен с помощью `Controllers.request()`:
 
 @[get-token](code/javaguide/forms/JavaCsrf.java)
 
-To help in adding CSRF tokens to forms, Play provides some template helpers.  The first one adds it to the query string of the action URL:
+Чтобы помочь в добавлении CSRF токенов в форму, Play предоставляет некоторые хелперы шаблона. Первый добавляет его в строку запроса URL контроллера формы: 
 
 @[csrf-call](code/javaguide/forms/csrf.scala.html)
 
-This might render a form that looks like this:
+В результате получится форма, которая выглядит следующим образом:
 
 ```html
 <form method="POST" action="/items?csrfToken=1234567890abcdef">
@@ -64,11 +64,11 @@ This might render a form that looks like this:
 </form>
 ```
 
-If it is undesirable to have the token in the query string, Play also provides a helper for adding the CSRF token as hidden field in the form:
+Нежелательно, чтобы токен присутствовал в строке запроса, поэтому Play также предоставляет хелпер для добавления CSRF токен в качестве скрытого поля формы:
 
 @[csrf-input](code/javaguide/forms/csrf.scala.html)
 
-This might render a form that looks like this:
+Отрендеренная форма будет выглядить примерно так:
 
 ```html
 <form method="POST" action="/items">
@@ -77,30 +77,30 @@ This might render a form that looks like this:
 </form>
 ```
 
-### Adding a CSRF token to the session
+### Добавление CSRF токена в сессию
 
-To ensure that a CSRF token is available to be rendered in forms, and sent back to the client, the global filter will generate a new token for all GET requests that accept HTML, if a token isn't already available in the incoming request.
+Чтобы убедиться, что CSRF токен доступен для рендеринга в формах, и отправлен назад клиенту,  глобальный фильтр сгенерирует новый токен для всех GET запросов, который принимает HTML, если токен уже не доступен во входящем запросе.
 
-## Applying CSRF filtering on a per action basis
+## Применение CSRF фильтрации на основе отдельных контроллеров
 
-Sometimes global CSRF filtering may not be appropriate, for example in situations where an application might want to allow some cross origin form posts.  Some non session based standards, such as OpenID 2.0, require the use of cross site form posting, or use form submission in server to server RPC communications.
+Иногда глобальная CSRF фильтрация может не подойти, например в ситуациях, где приложение захочет позволит некоторую перекрестную форму отправки. Некоторые стандарты ,базирующиеся не на сессии, такие как OpenID 2.0, требует использовать кросс-сайтовую форму отправки, или использовать отправку формы в сервер-сервер RPC коммуникациях.
 
-In these cases, Play provides two actions that can be composed with your applications actions.
+В этих случаях Play предоставляет два действия-контроллера, которые могут быть скомпонованы с контроллерами ваших приложений.
 
-The first action is the `play.filters.csrf.RequireCSRFCheck` action which performs the CSRF check. It should be added to all actions that accept session authenticated POST form submissions:
+Первый контроллер - это `play.filters.csrf.RequireCSRFCheck` который предоставляет проверку CSRF. Он должен быть добавлен во все методы, которые предоставляют отправку форму методом POST в аутентифицированной сессии:
 
 @[csrf-check](code/javaguide/forms/JavaCsrf.java)
 
-The second action is the `play.filters.csrf.AddCSRFToken` action, it generates a CSRF token if not already present on the incoming request. It should be added to all actions that render forms:
+Второй контроллер - это `play.filters.csrf.AddCSRFToken`, он генерирует токен CSRF , если он еще не присутствует во входящем запросе. Он должен быть добавлен во все контроллеры, которые рендерят формы:
 
 @[csrf-add-token](code/javaguide/forms/JavaCsrf.java)
 
-## CSRF configuration options
+## Опции конфигурации CSRF
 
-The full range of CSRF configuration options can be found in the filters [reference.conf](resources/confs/filters-helpers/reference.conf).  Some examples include:
+Полный спектр опций конфигурации CSRF может быть найден в описании фильтров [reference.conf](resources/confs/filters-helpers/reference.conf).  Некоторые примеры включают:
 
-* `play.filters.csrf.token.name` - The name of the token to use both in the session and in the request body/query string. Defaults to `csrfToken`.
-* `play.filters.csrf.cookie.name` - If configured, Play will store the CSRF token in a cookie with the given name, instead of in the session.
-* `play.filters.csrf.cookie.secure` - If `play.filters.csrf.cookie.name` is set, whether the CSRF cookie should have the secure flag set.  Defaults to the same value as `play.http.session.secure`.
-* `play.filters.csrf.body.bufferSize` - In order to read tokens out of the body, Play must first buffer the body and potentially parse it.  This sets the maximum buffer size that will be used to buffer the body.  Defaults to 100k.
-* `play.filters.csrf.token.sign` - Whether Play should use signed CSRF tokens.  Signed CSRF tokens ensure that the token value is randomised per request, thus defeating BREACH style attacks.
+* `play.filters.csrf.token.name` - Имя токена чтобы использовать и в сессии и в теле/строке запроса. По-умолчанию равняется `csrfToken`.
+* `play.filters.csrf.cookie.name` - Если сконфигурировано, Play будет хранить CSRF токен в cookie с данным именем вместо сессии.
+* `play.filters.csrf.cookie.secure` - Если `play.filters.csrf.cookie.name` установлен, указывает должен ли CSRF cookie иметь установленный флаг секурности. По-умолчанию имеет то же значение, что и `play.http.session.secure`.
+* `play.filters.csrf.body.bufferSize` - Для того чтобы читать токены вне тела, Play должен сперва буфферизировать тело и потенциально пропарсить его. Эта опция устанавливает максимальный размер буффера для буфферизации тела запроса.  По-умолчанию равен 100k.
+* `play.filters.csrf.token.sign` - Должен ли Play использовать подписанные CSRF токены. Подписанные CSRF токены убеждают, что значение токена сгенерировано случайным образом для каждого запроса, таким оборазом, защищая от BREACH стиля атак.
