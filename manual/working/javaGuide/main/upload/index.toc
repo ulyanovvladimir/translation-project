@@ -1,1 +1,1 @@
-JavaFileUpload:РџСЂСЏРјР°СЏ Р·Р°РіСЂСѓР·РєР° С„Р°Р№Р»РѕРІ Рё multipart/form-data
+JavaFileUpload:Прямая загрузка файлов и multipart/form-data
